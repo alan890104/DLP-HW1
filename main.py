@@ -75,7 +75,7 @@ def show_learning_curve(epoch, loss):
 
 if __name__ == "__main__":
     np.random.seed(890104)
-    X, y = generate_linear()
+    X, y = generate_XOR_easy()
 
     nn = Sequential(
         Linear(X.shape[1], HIDDEN_SIZE),
@@ -97,9 +97,6 @@ if __name__ == "__main__":
         accuracy = np.mean((pred_y > 0.5) == y)
         losses.append(loss)
         print(f"Epoch {epoch}, Loss: {loss:.7f}, Accuracy: {accuracy:.7f}")
-
-        if accuracy >= 0.99:
-            break
 
         opt.zero_grad()
         grad = loss_fn.backward(pred_y, y)
