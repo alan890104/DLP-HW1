@@ -1,5 +1,6 @@
 import numpy as np
 from .nn import MartiNet
+from typing import Literal
 
 
 class Sigmoid(MartiNet):
@@ -30,7 +31,7 @@ class Act(MartiNet):
         "sigmoid": Sigmoid(),
     }
 
-    def __init__(self, kind: str = "relu"):
+    def __init__(self, kind: Literal["relu", "sigmoid"] = "relu"):
         super().__init__()
         self.activation = self.func_map[kind]
 

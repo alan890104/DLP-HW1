@@ -1,4 +1,5 @@
 from .nn import Sequential, Linear
+from typing import Literal
 
 
 class GD:
@@ -26,7 +27,7 @@ class Optimizer:
         self,
         nn: Sequential,
         lr: float = 0.1,
-        kind: str = "gd",
+        kind: Literal["gd"] = "gd",
         **kwargs,
     ) -> None:
         self.opt = self.func_map[kind](nn, lr, **kwargs)
