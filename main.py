@@ -4,6 +4,8 @@ from martinet.nn import Sequential, Linear
 from martinet.act import Act
 from martinet.loss import Loss
 from martinet.optimizer import Optimizer
+from cli import getParser
+
 
 SAMPLE_SIZE = 100
 EPOCHS = 50000
@@ -18,7 +20,6 @@ def generate_linear(n: int = 100):
     labels = []
     for pt in pts:
         inputs.append([pt[0], pt[1]])
-        # distance = (pt[0] - pt[1]) / 1.414
         if pt[0] > pt[1]:
             labels.append(0)
         else:
@@ -74,24 +75,35 @@ def show_learning_curve(epoch, loss):
 
 
 if __name__ == "__main__":
-    np.random.seed(890104)
-    X, y = generate_XOR_easy()
+    # Parse arguments
+    parser = getParser()
+    args = parser.parse_args()
 
+    # Set seed
+    np.random.seed(args.seed)
+
+    # Set dataset
+    if args.dataset == "linear":
+        X, y = generate_linear(args.sample_size)
+    elif args.dataset == "xor":
+        X, y = generate_XOR_easy()
+
+    # Build model
     nn = Sequential(
-        Linear(X.shape[1], HIDDEN_SIZE),
+        Linear(X.shape[1], args.hidden_size),
         Act("relu"),
-        Linear(HIDDEN_SIZE, HIDDEN_SIZE),
+        Linear(args.hidden_size, args.hidden_size),
         Act("relu"),
-        Linear(HIDDEN_SIZE, OUTPUT_SIZE),
+        Linear(args.hidden_size, args.output_size),
         Act("sigmoid"),
     )
 
-    loss_fn = Loss("mse")
-    opt = Optimizer(nn, lr=LEARNING_RATE)
+    loss_fn = Loss(args.loss)
+    opt = Optimizer(nn, lr=args.learning_rate)
 
     losses = []
 
-    for epoch in range(EPOCHS):
+    for epoch in range(args.epochs):
         pred_y = nn.forward(X)
         loss = loss_fn.forward(pred_y, y)
         accuracy = np.mean((pred_y > 0.5) == y)
