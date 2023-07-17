@@ -7,13 +7,6 @@ from martinet.optimizer import Optimizer
 from cli import getParser
 
 
-SAMPLE_SIZE = 100
-EPOCHS = 50000
-HIDDEN_SIZE = 10
-OUTPUT_SIZE = 1
-LEARNING_RATE = 0.8
-
-
 def generate_linear(n: int = 100):
     pts = np.random.uniform(0, 1, (n, 2))
     inputs = []
@@ -99,14 +92,15 @@ if __name__ == "__main__":
     )
 
     loss_fn = Loss(args.loss)
-    opt = Optimizer(nn, lr=args.learning_rate)
+    opt = Optimizer(nn, kind=args.optimizer, lr=args.learning_rate)
 
     losses = []
 
     for epoch in range(args.epochs):
         pred_y = nn.forward(X)
         loss = loss_fn.forward(pred_y, y)
-        accuracy = np.mean((pred_y > 0.5) == y)
+        pred_label = pred_y > 0.5
+        accuracy = np.mean(pred_label == y)
         losses.append(loss)
         print(f"Epoch {epoch}, Loss: {loss:.7f}, Accuracy: {accuracy:.7f}")
 
@@ -117,3 +111,14 @@ if __name__ == "__main__":
 
     show_result(X, y, (pred_y > 0.5))
     show_learning_curve(range(len(losses)), losses)
+
+    # testing model
+    print("Testing model...")
+    if args.dataset == "linear":
+        X_test, y_test = generate_linear(args.sample_size)
+    elif args.dataset == "xor":
+        X_test, y_test = generate_XOR_easy()
+    pred_y = nn.forward(X_test)
+    pred_label = pred_y > 0.5
+    accuracy = np.mean(pred_label == y_test)
+    print(f"Test Accuracy: {accuracy:.7f}")

@@ -18,26 +18,27 @@ class GD:
                 layer.w_grad = None
 
 
-class Adam:
+class Momentum:
     def __init__(
         self,
         nn: Sequential,
         lr: float = 0.1,
-        alpha: float = 0.9,
-        beta: float = 0.999,
-        epsilon: float = 1e-8,
+        beta: float = 0.9,
         **kwargs,
     ) -> None:
-        self.nn = nn
-        self.m_dw, self.v_dw = 0, 0
-        self.m_db, self.v_db = 0, 0
-        self.alpha = alpha
-        self.beta = beta
-        self.epsilon = epsilon
-        self.lr = lr
+        self.nn: Sequential = nn
+        self.lr: float = lr
+        self.beta: float = beta
 
     def step(self) -> None:
-        pass
+        for layer in self.nn.layers:
+            if isinstance(layer, Linear):
+                if not hasattr(layer, "v"):
+                    setattr(layer, "v", 0)
+                layer.v = self.beta * layer.v - (
+                    self.lr * layer.w_grad / layer.w.shape[0]
+                )
+                layer.w += layer.v
 
     def zero_grad(self) -> None:
         for layer in self.nn.layers:
@@ -48,13 +49,14 @@ class Adam:
 class Optimizer:
     func_map = {
         "gd": GD,
+        "momentum": Momentum,
     }
 
     def __init__(
         self,
         nn: Sequential,
         lr: float = 0.1,
-        kind: Literal["gd"] = "gd",
+        kind: Literal["momentum", "gd"] = "momentum",
         **kwargs,
     ) -> None:
         self.opt = self.func_map[kind](nn, lr, **kwargs)

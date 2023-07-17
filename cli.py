@@ -37,7 +37,7 @@ def getParser() -> ArgumentParser:
         "-lr",
         "--learning_rate",
         type=float,
-        default=0.8,
+        default=0.1,
     )
     parser.add_argument(
         "--seed",
@@ -45,9 +45,15 @@ def getParser() -> ArgumentParser:
         default=890104,
     )
     parser.add_argument(
+        "--optimizer",
+        type=str,
+        choices=["momentum", "gd"],
+        default="momentum",
+    )
+    parser.add_argument(
         "--loss",
         type=str,
-        choices=["mse"],
-        default="mse",
+        choices=["mse", "bce"],
+        default="bce",
     )
     return parser
