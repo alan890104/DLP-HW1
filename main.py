@@ -72,6 +72,11 @@ if __name__ == "__main__":
     parser = getParser()
     args = parser.parse_args()
 
+    # Print arguments
+    print("Arguments:")
+    for arg in vars(args):
+        print(f"\t{arg}: {getattr(args, arg)}")
+
     # Set seed
     np.random.seed(args.seed)
 
@@ -121,4 +126,5 @@ if __name__ == "__main__":
     pred_y = nn.forward(X_test)
     pred_label = pred_y > 0.5
     accuracy = np.mean(pred_label == y_test)
+    print(pred_y)
     print(f"Test Accuracy: {accuracy:.7f}")
